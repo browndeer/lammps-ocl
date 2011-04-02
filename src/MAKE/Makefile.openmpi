@@ -8,11 +8,14 @@ SHELL = /bin/sh
 
 CC =		mpic++
 CCFLAGS =	-O2 \
-		-funroll-loops -fstrict-aliasing -Wall -W -Wno-uninitialized
+		-funroll-loops -fstrict-aliasing -Wall -W -Wno-uninitialized \
+		-I/usr/local/browndeer/include \
+		-DENABLE_OCL -DOCL_DEVNUM=0 -DOCL_CONTEXT=stdgpu \
+		-DWGSIZE=64 -DWGSIZE1=64 -DWGSIZE2=64
 DEPFLAGS =	-M
 LINK =		mpic++
 LINKFLAGS =	-O
-LIB =           -lstdc++
+LIB =           -lstdc++ -L/usr/local/browndeer/lib -lstdcl -L/usr/local/atistream/lib/x86_64 -lOpenCL
 ARCHIVE =	ar
 ARFLAGS =	-rcsv
 SIZE =		size
@@ -80,14 +83,18 @@ EXTRA_LIB = $(PKG_LIB) $(MPI_LIB) $(FFT_LIB) $(JPG_LIB) $(PKG_SYSLIB)
 
 # Link target
 
-$(EXE):	$(OBJ)
-	$(LINK) $(LINKFLAGS) $(EXTRA_PATH) $(OBJ) $(EXTRA_LIB) $(LIB) -o $(EXE)
+$(EXE):	$(OBJ) ocl.o
+	$(LINK) $(LINKFLAGS) $(EXTRA_PATH) $(OBJ) ocl.o $(EXTRA_LIB) $(LIB) -o $(EXE)
 	$(SIZE) $(EXE)
 
 # Library target
 
-lib:	$(OBJ)
-	$(ARCHIVE) $(ARFLAGS) $(EXE) $(OBJ)
+lib:	$(OBJ) ocl.o
+	$(ARCHIVE) $(ARFLAGS) $(EXE) $(OBJ) ocl.o
+
+ocl.o: neighbor_ocl.cl pair_eam_ocl.cl
+	clld --cl-source neighbor_ocl.cl pair_eam_ocl.cl
+	mv out_clld.o ocl.o
 
 # Compilation rules
 

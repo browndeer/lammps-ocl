@@ -11,6 +11,14 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------
+   Contributing authors:
+      David Richie (Brown Deer Technology) - OpenCL modifications
+------------------------------------------------------------------------- */
+
+/* DAR */
+
+
 #ifndef LMP_NEIGH_REQUEST_H
 #define LMP_NEIGH_REQUEST_H
 
@@ -36,6 +44,8 @@ class NeighRequest : protected Pointers {
 
   int half;              // 1 if half neigh list
   int full;              // 1 if full neigh list
+
+  int use_ocl;
 
   int gran;              // 1 if granular list
   int granhistory;       // 1 if granular history list

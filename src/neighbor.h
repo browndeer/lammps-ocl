@@ -11,9 +11,18 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------
+   Contributing authors:
+      David Richie (Brown Deer Technology) - OpenCL modifications
+------------------------------------------------------------------------- */
+
+/* DAR */
+
+
 #ifndef LMP_NEIGHBOR_H
 #define LMP_NEIGHBOR_H
 
+#include "stdcl.h"
 #include "pointers.h"
 
 namespace LAMMPS_NS {
@@ -156,6 +165,9 @@ class Neighbor : protected Pointers {
   int *glist;                  // lists to grow atom arrays every reneigh
   int *slist;                  // lists to grow stencil arrays every reneigh
 
+  void* clh;
+  cl_kernel krn1;
+
   void bin_atoms();                     // bin all atoms
   double bin_distance(int, int, int);   // distance between binx
   int coord2bin(double *);              // mapping atom coord to a bin
@@ -217,6 +229,7 @@ class Neighbor : protected Pointers {
   void full_nsq(class NeighList *);
   void full_nsq_ghost(class NeighList *);
   void full_bin(class NeighList *);
+  void full_bin_ocl(class NeighList *);
   void full_bin_ghost(class NeighList *);
   void full_multi(class NeighList *);
 

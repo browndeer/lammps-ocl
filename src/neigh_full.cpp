@@ -11,6 +11,15 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------
+   Contributing authors:
+      David Richie (Brown Deer Technology) - OpenCL modifications
+------------------------------------------------------------------------- */
+
+/* DAR */
+
+
+#include "stdcl.h"
 #include "neighbor.h"
 #include "neigh_list.h"
 #include "atom.h"
@@ -301,6 +310,127 @@ void Neighbor::full_bin(NeighList *list)
 
   list->inum = inum;
   list->gnum = 0;
+}
+
+extern int devnum;
+
+void Neighbor::full_bin_ocl(NeighList *list)
+{
+  int i,j,k,n,itype,jtype,ibin,which;
+  double xtmp,ytmp,ztmp,delx,dely,delz,rsq;
+  int *neighptr;
+
+  // bin local & ghost atoms
+
+  bin_atoms();
+
+	clmsync(OCL_CONTEXT,devnum,binhead,CL_MEM_DEVICE|CL_EVENT_NOWAIT);
+	clmsync(OCL_CONTEXT,devnum,bins,CL_MEM_DEVICE|CL_EVENT_NOWAIT);
+
+
+  // loop over each atom, storing neighbors
+
+  int **special = atom->special;
+  int **nspecial = atom->nspecial;
+  int *tag = atom->tag;
+
+  double **x = atom->x;
+  int *type = atom->type;
+  int *mask = atom->mask;
+  int *molecule = atom->molecule;
+  int nlocal = atom->nlocal;
+  int nall = nlocal + atom->nghost;
+  int molecular = atom->molecular;
+  if (includegroup) nlocal = atom->nfirst;
+
+  int *ilist = list->ilist;
+  int *numneigh = list->numneigh;
+  int **firstneigh = list->firstneigh;
+  int **pages = list->pages;
+  int nstencil = list->nstencil;
+  int *stencil = list->stencil;
+
+  int inum = 0;
+  int npage = 0;
+  int npnt = 0;
+
+
+	if (!list->nndataoffset) { 
+		list->nndataoffset = (int*)
+         clmalloc(OCL_CONTEXT,nlocal*sizeof(int),0);
+	}
+
+	if (!list->nndata) {
+		list->nndata = (int*)clmalloc(OCL_CONTEXT,nlocal*135*sizeof(int),0);
+	}
+
+
+	int* nndataoffset = list->nndataoffset;
+	int* nndata = list->nndata;
+
+	static int* img_stencil = 0;
+
+	if (img_stencil == 0) {
+
+		img_stencil 
+			= (int*)clmalloc(OCL_CONTEXT,4*nstencil*sizeof(int),CL_MEM_DETACHED);
+		cl_image_format fmt;
+		fmt.image_channel_order = CL_RGBA;
+		fmt.image_channel_data_type = CL_SIGNED_INT32;
+		clmctl(img_stencil,CL_MCTL_SET_IMAGE2D,4*nstencil,1,&fmt);
+  	 	clmattach(OCL_CONTEXT,img_stencil);
+	
+		for (k = 0; k < nstencil; k++) {
+			img_stencil[4*k+0] = stencil[k];
+		}
+
+		clmsync(OCL_CONTEXT,devnum,img_stencil,CL_MEM_DEVICE|CL_EVENT_NOWAIT);
+
+	}
+
+	double* x_data = x[0];
+
+	clmsync(OCL_CONTEXT,devnum,x_data,CL_MEM_DEVICE|CL_EVENT_NOWAIT);
+
+	clarg_set(OCL_CONTEXT,krn1,0,nlocal);
+	clarg_set(OCL_CONTEXT,krn1,1,bboxhi[0]);
+	clarg_set(OCL_CONTEXT,krn1,2,bboxhi[1]);
+	clarg_set(OCL_CONTEXT,krn1,3,bboxhi[2]);
+	clarg_set(OCL_CONTEXT,krn1,4,bboxlo[0]);
+	clarg_set(OCL_CONTEXT,krn1,5,bboxlo[1]);
+	clarg_set(OCL_CONTEXT,krn1,6,bboxlo[2]);
+	clarg_set(OCL_CONTEXT,krn1,7,bininvx);
+	clarg_set(OCL_CONTEXT,krn1,8,bininvy);
+	clarg_set(OCL_CONTEXT,krn1,9,bininvz);
+	clarg_set(OCL_CONTEXT,krn1,10,mbinxlo);
+	clarg_set(OCL_CONTEXT,krn1,11,mbinylo);
+	clarg_set(OCL_CONTEXT,krn1,12,mbinzlo);
+	clarg_set(OCL_CONTEXT,krn1,13,nbinx);
+	clarg_set(OCL_CONTEXT,krn1,14,nbiny);
+	clarg_set(OCL_CONTEXT,krn1,15,nbinz);
+	clarg_set(OCL_CONTEXT,krn1,16,mbinx);
+	clarg_set(OCL_CONTEXT,krn1,17,mbiny);
+	clarg_set(OCL_CONTEXT,krn1,18,mbinz);
+	clarg_set(OCL_CONTEXT,krn1,19,cutneighsq[1][1]);
+	clarg_set(OCL_CONTEXT,krn1,20,nstencil);
+	clarg_set_global(OCL_CONTEXT,krn1,21,img_stencil);
+	clarg_set_global(OCL_CONTEXT,krn1,22,binhead);
+	clarg_set_global(OCL_CONTEXT,krn1,23,bins);
+	clarg_set_global(OCL_CONTEXT,krn1,24,x_data);
+	clarg_set_global(OCL_CONTEXT,krn1,25,numneigh);
+	clarg_set_global(OCL_CONTEXT,krn1,26,nndataoffset);
+	clarg_set_global(OCL_CONTEXT,krn1,27,nndata);
+
+	clndrange_t ndr = clndrange_init1d( 0, nlocal+WGSIZE-nlocal%WGSIZE, WGSIZE );
+
+	clfork(OCL_CONTEXT,devnum,krn1,&ndr,CL_EVENT_NOWAIT);
+
+	clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+
+  list->inum = nlocal;
+
+	for(int i=0;i<nlocal;i++) ilist[i] = i;
+
 }
 
 /* ----------------------------------------------------------------------

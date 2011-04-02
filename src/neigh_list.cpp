@@ -11,6 +11,15 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------
+   Contributing authors:
+      David Richie (Brown Deer Technology) - OpenCL modifications
+------------------------------------------------------------------------- */
+
+/* DAR */
+
+
+#include "stdcl.h"
 #include "lmptype.h"
 #include "neigh_list.h"
 #include "atom.h"
@@ -38,6 +47,9 @@ NeighList::NeighList(LAMMPS *lmp, int size) : Pointers(lmp)
   numneigh = NULL;
   firstneigh = NULL;
   firstdouble = NULL;
+
+  nndataoffset = 0;
+  nndata = 0;
 
   maxpage = 0;
   pages = NULL;
@@ -126,6 +138,9 @@ void NeighList::grow(int nmax)
   memory->create(numneigh,maxatoms,"neighlist:numneigh");
   firstneigh = (int **) memory->smalloc(maxatoms*sizeof(int *),
 					"neighlist:firstneigh");
+
+  clmattach(OCL_CONTEXT,ilist);
+  clmattach(OCL_CONTEXT,numneigh);
 
   if (dnum) 
     firstdouble = (double **) memory->smalloc(maxatoms*sizeof(double *),

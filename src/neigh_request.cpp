@@ -11,6 +11,14 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------
+   Contributing authors:
+      David Richie (Brown Deer Technology) - OpenCL modifications
+------------------------------------------------------------------------- */
+
+/* DAR */
+
+
 #include "neigh_request.h"
 #include "atom.h"
 #include "memory.h"
@@ -34,6 +42,7 @@ NeighRequest::NeighRequest(LAMMPS *lmp) : Pointers(lmp)
 
   half = 1;
   full = 0;
+  use_ocl = 0;
   gran = granhistory = 0;
   respainner = respamiddle = respaouter = 0;
   half_from_full = 0;

@@ -65,6 +65,7 @@ help:
 	@if [ ! -d Obj_$@ ]; then mkdir Obj_$@; fi
 	@$(SHELL) Make.sh style
 	@cp -p *.cpp *.h Obj_$@
+	@cp -p *.cl Obj_$@
 	@cp MAKE/Makefile.$@ Obj_$@/Makefile
 	@if [ ! -e Makefile.package ]; then make package-regenerate; fi
 	@cp Makefile.package Obj_$@

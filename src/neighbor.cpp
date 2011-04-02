@@ -12,14 +12,19 @@
 ------------------------------------------------------------------------- */
 
 /* ----------------------------------------------------------------------
-   Contributing author (triclinic and multi-neigh) : Pieter in 't Veld (SNL)
+   Contributing author (triclinic and multi-neigh) : Pieter in 't Veld (SNL),
+      David Richie (Brown Deer Technology) - OpenCL modifications
 ------------------------------------------------------------------------- */
+
+/* DAR */
+
 
 #include "lmptype.h"
 #include "mpi.h"
 #include "math.h"
 #include "stdlib.h"
 #include "string.h"
+#include "stdcl.h"
 #include "neighbor.h"
 #include "neigh_list.h"
 #include "neigh_request.h"
@@ -133,6 +138,10 @@ Neighbor::Neighbor(LAMMPS *lmp) : Pointers(lmp)
   dihedrallist = NULL;
   maximproper = 0;
   improperlist = NULL;
+
+  clh = clopen(OCL_CONTEXT,0,CLLD_NOW);
+  krn1 = clsym(OCL_CONTEXT,clh,"neighbor_kern1",CLLD_NOW);
+
 }
 
 /* ---------------------------------------------------------------------- */
@@ -360,6 +369,7 @@ void Neighbor::init()
     if (maxbin == 0) {
       maxbin = atom->nmax;
       memory->create(bins,maxbin,"bins");
+      clmattach(OCL_CONTEXT,bins);
     }
   }
     
@@ -847,13 +857,15 @@ void Neighbor::choose_build(int index, NeighRequest *rq)
     }
 
   } else if (rq->full) {
+
     if (style == NSQ) {
       if (rq->ghost == 0) pb = &Neighbor::full_nsq;
       else if (includegroup) 
 	error->all("Neighbor include group not allowed with ghost neighbors");
       else if (rq->ghost == 1) pb = &Neighbor::full_nsq_ghost;
     } else if (style == BIN) {
-      if (rq->ghost == 0) pb = &Neighbor::full_bin;
+      if (rq->ghost == 0 && rq->use_ocl) pb = &Neighbor::full_bin_ocl;
+      else if (rq->ghost == 0) pb = &Neighbor::full_bin;
       else if (includegroup) 
 	error->all("Neighbor include group not allowed with ghost neighbors");
       else if (rq->ghost == 1) pb = &Neighbor::full_bin_ghost;
@@ -1166,6 +1178,7 @@ void Neighbor::build()
     maxbin = atom->nmax;
     memory->destroy(bins);
     memory->create(bins,maxbin,"bins");
+    clmattach(OCL_CONTEXT,bins);
   }
 
   // check that pairwise lists with special bond weighting will not overflow
@@ -1387,6 +1400,7 @@ void Neighbor::setup_bins()
     maxhead = mbins;
     memory->destroy(binhead);
     memory->create(binhead,maxhead,"neigh:binhead");
+    clmattach(OCL_CONTEXT,binhead);
   }
 
   // create stencil of bins to search over in neighbor list construction

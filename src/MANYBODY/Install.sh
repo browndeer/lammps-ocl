@@ -9,6 +9,7 @@ if (test $1 = 1) then
   cp pair_airebo.cpp ..
   cp pair_comb.cpp ..
   cp pair_eam.cpp ..
+  cp pair_eam_ocl.cpp ..
   cp pair_eam_alloy.cpp ..
   cp pair_eam_fs.cpp ..
   cp pair_eim.cpp ..
@@ -20,12 +21,15 @@ if (test $1 = 1) then
   cp pair_airebo.h ..
   cp pair_comb.h ..
   cp pair_eam.h ..
+  cp pair_eam_ocl.h ..
   cp pair_eam_alloy.h ..
   cp pair_eam_fs.h ..
   cp pair_eim.h ..
   cp pair_sw.h ..
   cp pair_tersoff.h ..
   cp pair_tersoff_zbl.h ..
+
+  cp pair_eam_ocl.cl ..
 
   if (test -e ../pair_lj_cut_opt.h) then
     cd ../OPT; sh Install.sh 1
@@ -37,6 +41,7 @@ elif (test $1 = 0) then
   rm ../pair_airebo.cpp
   rm ../pair_comb.cpp
   rm ../pair_eam.cpp
+  rm ../pair_eam_ocl.cpp
   rm ../pair_eam_alloy.cpp
   rm ../pair_eam_fs.cpp
   rm ../pair_eim.cpp
@@ -48,12 +53,15 @@ elif (test $1 = 0) then
   rm ../pair_airebo.h
   rm ../pair_comb.h
   rm ../pair_eam.h
+  rm ../pair_eam_ocl.h
   rm ../pair_eam_alloy.h
   rm ../pair_eam_fs.h
   rm ../pair_eim.h
   rm ../pair_sw.h
   rm ../pair_tersoff.h
   rm ../pair_tersoff_zbl.h
+
+  rm ../pair_eam_ocl.cl
 
   if (test -e ../pair_eam_opt.h) then
     cd ../OPT; sh Install.sh 0; sh Install.sh 1

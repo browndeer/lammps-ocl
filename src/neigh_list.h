@@ -11,6 +11,14 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------
+   Contributing authors:
+      David Richie (Brown Deer Technology) - OpenCL modifications
+------------------------------------------------------------------------- */
+
+/* DAR */
+
+
 #ifndef LMP_NEIGH_LIST_H
 #define LMP_NEIGH_LIST_H
 
@@ -36,6 +44,9 @@ class NeighList : protected Pointers {
   int *numneigh;                   // # of J neighbors for each I atom
   int **firstneigh;                // ptr to 1st J int value of each I atom
   double **firstdouble;            // ptr to 1st J double value of each I atom
+
+  int* nndataoffset;
+  int* nndata;
 
   int pgsize;                      // size of each page
   int maxpage;                     // # of pages currently allocated

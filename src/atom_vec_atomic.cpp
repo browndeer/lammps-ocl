@@ -11,6 +11,15 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------
+   Contributing authors:
+      David Richie (Brown Deer Technology) - OpenCL modifications
+------------------------------------------------------------------------- */
+
+/* DAR */
+
+
+#include "stdcl.h"
 #include "lmptype.h"
 #include "stdlib.h"
 #include "atom_vec_atomic.h"
@@ -64,6 +73,9 @@ void AtomVecAtomic::grow(int n)
   x = memory->grow(atom->x,nmax,3,"atom:x");
   v = memory->grow(atom->v,nmax,3,"atom:v");
   f = memory->grow(atom->f,nmax,3,"atom:f");
+
+  clmattach(OCL_CONTEXT,x[0]);
+  clmattach(OCL_CONTEXT,f[0]);
 
   if (atom->nextra_grow)
     for (int iextra = 0; iextra < atom->nextra_grow; iextra++) 
