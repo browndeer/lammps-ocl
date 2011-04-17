@@ -48,6 +48,7 @@ NeighList::NeighList(LAMMPS *lmp, int size) : Pointers(lmp)
   firstneigh = NULL;
   firstdouble = NULL;
 
+  nndata_alloc_size = 0;
   nndataoffset = 0;
   nndata = 0;
 

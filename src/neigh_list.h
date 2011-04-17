@@ -45,6 +45,7 @@ class NeighList : protected Pointers {
   int **firstneigh;                // ptr to 1st J int value of each I atom
   double **firstdouble;            // ptr to 1st J double value of each I atom
 
+  size_t nndata_alloc_size;
   int* nndataoffset;
   int* nndata;
 

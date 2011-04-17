@@ -355,13 +355,14 @@ void Neighbor::full_bin_ocl(NeighList *list)
   int npnt = 0;
 
 
-	if (!list->nndataoffset) { 
+	if (nlocal > list->nndata_alloc_size) { 
+		if (list->nndataoffset) clfree(list->nndataoffset);
+		if (list->nndata) clfree(list->nndata);
+		list->nndata_alloc_size = nlocal + nlocal/10;
 		list->nndataoffset = (int*)
-         clmalloc(OCL_CONTEXT,nlocal*sizeof(int),0);
-	}
-
-	if (!list->nndata) {
-		list->nndata = (int*)clmalloc(OCL_CONTEXT,nlocal*135*sizeof(int),0);
+		clmalloc(OCL_CONTEXT,list->nndata_alloc_size*sizeof(int),0);
+		list->nndata = (int*)
+			clmalloc(OCL_CONTEXT,list->nndata_alloc_size*135*sizeof(int),0);
 	}
 
 
@@ -428,6 +429,7 @@ void Neighbor::full_bin_ocl(NeighList *list)
 	clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
 
   list->inum = nlocal;
+  list->gnum = 0;
 
 	for(int i=0;i<nlocal;i++) ilist[i] = i;
 
