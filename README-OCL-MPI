@@ -1,0 +1,32 @@
+
+The following instructions describe how to use multiple GPUs with the
+standard MPI decomposition in LAMMPS.  This technique requires using 
+coprthr-v1.2 (pre-release) which is designated as the 'current' branch
+of coprthr at the present time.  Additionally, this requires using 
+'make openmpi' to build LAMMPS, which is the the only makefile that has
+been modified for the LAMMPS-OCL work.
+
+In order to use multiple GPUs, LAMMPS should be run with one MPI process
+per GPU across the target system.
+
+The critical step is to set the environment variable STDGPU_LOCK to a number
+common across the MPI job, but otherwise unique (in the unlikely event that
+someone is using the system at the same time).
+
+For example (bash),
+
+	export STDGPU_LOCK 123456; \
+	mpirun -np 4 ./lmp_openmpi < in.lj_ocl
+
+would run LAMMPS using 4 GPUs on a workstation with 4 graphics cards.  This
+can be extended to larger MPI jobs across multiple nodes.
+
+The environment variable STDGPU_LOCK causes the stdgpu context to contain
+GPUs exclusive to each process within the same locking group using the same
+specified key.  This completely resolves the issue of requiring MPI processes
+to figure out which GPU they are supposed to use.  The result is that tehre 
+is absolutely no source code changes required to support multiple GPUs, or
+MPI jobs in general, from an OpenCL perspective.
+
+-DAR
+
