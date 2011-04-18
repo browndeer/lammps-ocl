@@ -10,8 +10,8 @@ CC =		mpic++
 CCFLAGS =	-O2 \
 		-funroll-loops -fstrict-aliasing -Wall -W -Wno-uninitialized \
 		-I/usr/local/browndeer/include \
-		-DENABLE_OCL -DOCL_DEVNUM=0 -DOCL_CONTEXT=stdgpu \
-		-DWGSIZE=64 -DWGSIZE1=64 -DWGSIZE2=64
+		-DENABLE_OCL -DOCL_DEVNUM=1 -DOCL_CONTEXT=stdgpu \
+		-DWGSIZE=128 -DWGSIZE1=128 -DWGSIZE2=128
 DEPFLAGS =	-M
 LINK =		mpic++
 LINKFLAGS =	-O
@@ -92,8 +92,8 @@ $(EXE):	$(OBJ) ocl.o
 lib:	$(OBJ) ocl.o
 	$(ARCHIVE) $(ARFLAGS) $(EXE) $(OBJ) ocl.o
 
-ocl.o: neighbor_ocl.cl pair_eam_ocl.cl
-	clld --cl-source neighbor_ocl.cl pair_eam_ocl.cl
+ocl.o: neighbor_ocl.cl pair_eam_ocl.cl pair_lj_cut_ocl.cl
+	clld --cl-source neighbor_ocl.cl pair_eam_ocl.cl pair_lj_cut_ocl.cl
 	mv out_clld.o ocl.o
 
 # Compilation rules
