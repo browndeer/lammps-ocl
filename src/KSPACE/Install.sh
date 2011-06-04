@@ -14,6 +14,7 @@ if (test $1 = 1) then
   cp pair_lj_cut_coul_long.cpp ..
   cp pair_lj_cut_coul_long_tip4p.cpp ..
   cp pair_lj_charmm_coul_long.cpp ..
+  cp pair_lj_charmm_coul_long_ocl.cpp ..
   cp fft3d.cpp ..
   cp fft3d_wrap.cpp ..
   cp remap.cpp ..
@@ -28,6 +29,7 @@ if (test $1 = 1) then
   cp pair_lj_cut_coul_long.h ..
   cp pair_lj_cut_coul_long_tip4p.h ..
   cp pair_lj_charmm_coul_long.h ..
+  cp pair_lj_charmm_coul_long_ocl.h ..
   cp fft3d.h ..
   cp fft3d_wrap.h ..
   cp remap.h ..
@@ -44,6 +46,7 @@ elif (test $1 = 0) then
   rm ../pair_lj_cut_coul_long.cpp
   rm ../pair_lj_cut_coul_long_tip4p.cpp
   rm ../pair_lj_charmm_coul_long.cpp
+  rm ../pair_lj_charmm_coul_long_ocl.cpp
   rm ../fft3d.cpp
   rm ../fft3d_wrap.cpp
   rm ../remap.cpp
@@ -58,6 +61,7 @@ elif (test $1 = 0) then
   rm ../pair_lj_cut_coul_long.h
   rm ../pair_lj_cut_coul_long_tip4p.h
   rm ../pair_lj_charmm_coul_long.h
+  rm ../pair_lj_charmm_coul_long_ocl.h
   rm ../fft3d.h
   rm ../fft3d_wrap.h
   rm ../remap.h
