@@ -24,7 +24,7 @@ can be extended to larger MPI jobs across multiple nodes.
 The environment variable STDGPU_LOCK causes the stdgpu context to contain
 GPUs exclusive to each process within the same locking group using the same
 specified key.  This completely resolves the issue of requiring MPI processes
-to figure out which GPU they are supposed to use.  The result is that tehre 
+to figure out which GPU they are supposed to use.  The result is that there
 is absolutely no source code changes required to support multiple GPUs, or
 MPI jobs in general, from an OpenCL perspective.
 
