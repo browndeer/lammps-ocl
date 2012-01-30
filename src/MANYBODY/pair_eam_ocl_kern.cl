@@ -18,12 +18,15 @@
 
 /* DAR */
 
+#define __AMD__
+
 #if defined(__AMD__) || defined(__coprthr__)
 #pragma OPENCL EXTENSION cl_amd_fp64 : enable
 #else
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 #endif
 
+#include "/usr/local/browndeer/include/stdcl.h"
 
 __kernel void
 pair_eam_kern1(
@@ -85,14 +88,17 @@ pair_eam_kern1(
 				int mx = m%nrhor;
 				int my = m/nrhor;
 
-				float4 c = read_imagef(rhor_spline23, sampler0, (int2)(mx,my));
+				float4 c = read_imagef(rhor_spline23, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				double coeff3 = as_double(c.zw);
 
-				c = read_imagef(rhor_spline45, sampler0, (int2)(mx,my));
+				c = read_imagef(rhor_spline45, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				double coeff4 = as_double(c.xy);
 				double coeff5 = as_double(c.zw);
 
-				c = read_imagef(rhor_spline67, sampler0, (int2)(mx,my));
+				c = read_imagef(rhor_spline67, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				double coeff6 = as_double(c.xy);
 
 				tmp += ((coeff3*p + coeff4)*p + coeff5)*p + coeff6;
@@ -143,8 +149,10 @@ pair_eam_kern2(
 		int mx = m%nfrho;
 		int my = m/nfrho;
 
-		float4 c01 = read_imagef(frho_spline01, sampler0, (int2)(mx,my));
-		float4 c23 = read_imagef(frho_spline23, sampler0, (int2)(mx,my));
+		float4 c01 = read_imagef(frho_spline01, sampler0, 
+			__builtin_vector_int2(mx,my) );
+		float4 c23 = read_imagef(frho_spline23, sampler0, 
+			__builtin_vector_int2(mx,my) );
 
 		double coeff0 = as_double(c01.xy);
 		double coeff1 = as_double(c01.zw);
@@ -154,8 +162,10 @@ pair_eam_kern2(
 
 		if (eflag == 1) {
 
-			float4 c45 = read_imagef(frho_spline45, sampler0, (int2)(mx,my));
-			float4 c67 = read_imagef(frho_spline67, sampler0, (int2)(mx,my));
+			float4 c45 = read_imagef(frho_spline45, sampler0, 
+				__builtin_vector_int2(mx,my) );
+			float4 c67 = read_imagef(frho_spline67, sampler0, 
+				__builtin_vector_int2(mx,my) );
 
 			double coeff3 = as_double(c23.zw);
 			double coeff4 = as_double(c45.xy);
@@ -251,20 +261,24 @@ pair_eam_kern3(
 				int mx = m%nrhor;
 				int my = m/nrhor;
 
-				float4 c = read_imagef(rhor_spline01, sampler0, (int2)(mx,my));
+				float4 c = read_imagef(rhor_spline01, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				double coeff0 = as_double(c.xy);
 				double coeff1 = as_double(c.zw);
 
-				c = read_imagef(rhor_spline23, sampler0, (int2)(mx,my));
+				c = read_imagef(rhor_spline23, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				double coeff2 = as_double(c.xy);
 
    			double rhoip = (coeff0*p + coeff1)*p + coeff2;
 				
-				c = read_imagef(rhor_spline01, sampler0, (int2)(mx,my));
+				c = read_imagef(rhor_spline01, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				coeff0 = as_double(c.xy);
 				coeff1 = as_double(c.zw);
 
-				c = read_imagef(rhor_spline23, sampler0, (int2)(mx,my));
+				c = read_imagef(rhor_spline23, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				coeff2 = as_double(c.xy);
 
    			double rhojp = (coeff0*p + coeff1)*p + coeff2;
@@ -272,19 +286,23 @@ pair_eam_kern3(
 				mx = m%nz2r;
 				my = m/nz2r;
 
-				c = read_imagef(z2r_spline01, sampler0, (int2)(mx,my));
+				c = read_imagef(z2r_spline01, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				coeff0 = as_double(c.xy);
 				coeff1 = as_double(c.zw);
 
-				c = read_imagef(z2r_spline23, sampler0, (int2)(mx,my));
+				c = read_imagef(z2r_spline23, sampler0, 
+					__builtin_vector_int2(mx,my));
 				coeff2 = as_double(c.xy);
 				double coeff3 = as_double(c.zw);
 
-				c = read_imagef(z2r_spline45, sampler0, (int2)(mx,my));
+				c = read_imagef(z2r_spline45, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				double coeff4 = as_double(c.xy);
 				double coeff5 = as_double(c.zw);
 
-				c = read_imagef(z2r_spline67, sampler0, (int2)(mx,my));
+				c = read_imagef(z2r_spline67, sampler0, 
+					__builtin_vector_int2(mx,my) );
 				double coeff6 = as_double(c.xy);
 
    			double z2p = (coeff0*p + coeff1)*p + coeff2;

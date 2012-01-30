@@ -266,13 +266,13 @@ void PairEAM_OCL::compute(int eflag, int vflag)
 
 	if (!eflag) {
 
-		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT);
 	
 	} else {
 
 		clmsync(OCL_CONTEXT,devnum,phiatom,CL_MEM_HOST|CL_EVENT_NOWAIT);
 
-		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT);
 
 		for (ii = 0; ii < inum; ii++) {
 			i = ii;
@@ -327,7 +327,7 @@ void PairEAM_OCL::compute(int eflag, int vflag)
 		clmsync(OCL_CONTEXT,devnum,phiatom,CL_MEM_HOST|CL_EVENT_NOWAIT);
 		clmsync(OCL_CONTEXT,devnum,vtmp,CL_MEM_HOST|CL_EVENT_NOWAIT);
 
-		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT);
 
 		if (eflag && eflag_either) {
 			for (ii = 0; ii < inum; ii++) {
@@ -361,7 +361,7 @@ void PairEAM_OCL::compute(int eflag, int vflag)
 
 	} else {
 
-		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+		clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT);
 	
 	}
 
@@ -885,7 +885,7 @@ void PairEAM_OCL::array2spline()
 	clmsync(OCL_CONTEXT,devnum,z2r_spline45,CL_MEM_DEVICE|CL_EVENT_NOWAIT);
 	clmsync(OCL_CONTEXT,devnum,z2r_spline67,CL_MEM_DEVICE|CL_EVENT_NOWAIT);
 
-	clwait(OCL_CONTEXT,devnum,CL_MEM_EVENT|CL_EVENT_RELEASE);
+	clwait(OCL_CONTEXT,devnum,CL_MEM_EVENT);
 
 }
 

@@ -18,6 +18,8 @@
 
 /* DAR */
 
+#define __AMD__
+
 #if defined(__AMD__) || defined(__coprthr__)
 #pragma OPENCL EXTENSION cl_amd_fp64 : enable
 #else

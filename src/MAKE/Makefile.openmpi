@@ -10,12 +10,15 @@ CC =		mpic++
 CCFLAGS =	-O2 \
 		-funroll-loops -fstrict-aliasing -Wall -W -Wno-uninitialized \
 		-I/usr/local/browndeer/include \
-		-DENABLE_OCL -DOCL_DEVNUM=1 -DOCL_CONTEXT=stdgpu \
-		-DWGSIZE=128 -DWGSIZE1=128 -DWGSIZE2=128
+		-DENABLE_OCL -DOCL_DEVNUM=0 -DOCL_CONTEXT=stdcpu \
+		-DWGSIZE=16 -DWGSIZE1=16 -DWGSIZE2=16
 DEPFLAGS =	-M
 LINK =		mpic++
 LINKFLAGS =	-O
-LIB =           -lstdc++ -L/usr/local/browndeer/lib -lstdcl -L/usr/local/atistream/lib/x86_64 -lOpenCL
+#LIB =           -lstdc++ -L/usr/local/browndeer/lib -lstdcl -lssl -L/usr/local/atistream/lib/x86_64 -lOpenCL
+#LIB =           -lstdc++ -L/usr/local/browndeer/lib -lstdcl -lssl -locl
+#LIB =           -lstdc++ -L/usr/local/browndeer/lib -lstdcl_d -lssl -L/usr/local/atistream/lib/x86_64 -locl
+LIB =           -lstdc++ -L/usr/local/browndeer/lib -lstdcl -lssl -lOpenCL
 ARCHIVE =	ar
 ARFLAGS =	-rcsv
 SIZE =		size
@@ -92,9 +95,10 @@ $(EXE):	$(OBJ) ocl.o
 lib:	$(OBJ) ocl.o
 	$(ARCHIVE) $(ARFLAGS) $(EXE) $(OBJ) ocl.o
 
-ocl.o: neighbor_ocl.cl pair_eam_ocl.cl pair_lj_cut_ocl.cl
-	clld --cl-source neighbor_ocl.cl pair_eam_ocl.cl pair_lj_cut_ocl.cl
-	mv out_clld.o ocl.o
+ocl.o: neighbor_ocl_kern.cl pair_eam_ocl_kern.cl pair_lj_cut_ocl_kern.cl
+#	clld --cl-source neighbor_ocl.cl pair_eam_ocl.cl pair_lj_cut_ocl.cl
+#	mv out_clld.o ocl.o
+	clcc neighbor_ocl_kern.cl pair_eam_ocl_kern.cl pair_lj_cut_ocl_kern.cl -o ocl.o
 
 # Compilation rules
 

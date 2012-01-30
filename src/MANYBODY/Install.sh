@@ -29,7 +29,7 @@ if (test $1 = 1) then
   cp pair_tersoff.h ..
   cp pair_tersoff_zbl.h ..
 
-  cp pair_eam_ocl.cl ..
+  cp pair_eam_ocl_kern.cl ..
 
   if (test -e ../pair_lj_cut_opt.h) then
     cd ../OPT; sh Install.sh 1
@@ -61,7 +61,7 @@ elif (test $1 = 0) then
   rm ../pair_tersoff.h
   rm ../pair_tersoff_zbl.h
 
-  rm ../pair_eam_ocl.cl
+  rm ../pair_eam_ocl_kern.cl
 
   if (test -e ../pair_eam_opt.h) then
     cd ../OPT; sh Install.sh 0; sh Install.sh 1

@@ -158,7 +158,7 @@ void PairLJCut_OCL::compute(int eflag, int vflag)
       clmsync(OCL_CONTEXT,devnum,eatom,CL_MEM_HOST|CL_EVENT_NOWAIT);
       clmsync(OCL_CONTEXT,devnum,vtmp,CL_MEM_HOST|CL_EVENT_NOWAIT);
 
-      clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+      clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT);
 
       if (eflag && eflag_either) {
          for (ii = 0; ii < inum; ii++) {
@@ -192,7 +192,7 @@ void PairLJCut_OCL::compute(int eflag, int vflag)
 
    } else {
 
-      clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+      clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT);
 
    }
 
@@ -616,7 +616,7 @@ void PairLJCut_OCL::init_style()
 	special_lj_ocl[4] = special_lj[2];
 	special_lj_ocl[6] = special_lj[3];
 	clmsync(OCL_CONTEXT,devnum,special_lj_ocl,CL_MEM_DEVICE|CL_EVENT_NOWAIT);
-	clwait(OCL_CONTEXT,devnum,CL_MEM_EVENT|CL_EVENT_RELEASE);
+	clwait(OCL_CONTEXT,devnum,CL_MEM_EVENT);
 
 }
 

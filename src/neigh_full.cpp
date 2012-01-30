@@ -426,7 +426,7 @@ void Neighbor::full_bin_ocl(NeighList *list)
 
 	clfork(OCL_CONTEXT,devnum,krn1,&ndr,CL_EVENT_NOWAIT);
 
-	clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT|CL_EVENT_RELEASE);
+	clwait(OCL_CONTEXT,devnum,CL_ALL_EVENT);
 
   list->inum = nlocal;
   list->gnum = 0;

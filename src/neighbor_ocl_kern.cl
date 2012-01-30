@@ -18,11 +18,15 @@
 
 /* DAR */
 
+#define __AMD__
+
 #if defined(__AMD__) || defined(__coprthr__)
 #pragma OPENCL EXTENSION cl_amd_fp64 : enable
 #else
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 #endif
+
+#include "/usr/local/browndeer/include/stdcl.h"
 
 __kernel void
 neighbor_kern1(
@@ -62,8 +66,6 @@ neighbor_kern1(
 		int nptr = nptr0;
 		nndataoffset[gti] = nptr0;
 
-// 		ibin = coord2bin(x[i]);
-
 		int xhi = (int)((xtmp-xbboxhi)*bininvx) - mbinxlo + nbinx;
 		int xlo = (int)((xtmp-xbboxlo)*bininvx) - mbinxlo;
 		int yhi = (int)((ytmp-ybboxhi)*bininvy) - mbinylo + nbiny;
@@ -71,30 +73,12 @@ neighbor_kern1(
 		int zhi = (int)((ztmp-zbboxhi)*bininvz) - mbinzlo + nbinz;
 		int zlo = (int)((ztmp-zbboxlo)*bininvz) - mbinzlo;
 
-//		if (xtmp >= xbboxhi)
-//			ix = xhi + nbinx;
-//		else if (xtmp >= xbboxlo)
-//			ix = xlo;
-//		else
-//			ix = xlo - 1;
 		int ix = ((xtmp >= xbboxhi)? xhi : xlo);
 		ix = ((xtmp < xbboxlo)? ix-1 : ix);
 
-// 		if (ytmp >= ybboxhi)
-//			iy = yhi + nbiny;
-//		else if (ytmp >= ybboxlo)
-//			iy = ylo;
-//		else
-//			iy = ylo - 1;
 		int iy = ((ytmp >= ybboxhi)? yhi : ylo);
 		iy = ((ytmp < ybboxlo)? iy-1 : iy);
 
-//		if (ztmp >= zbboxhi)
-//			iz = zhi + nbinz;
-//		else if (ztmp >= zbboxlo)
-//			iz = zlo;
-//		else
-//			iz = zlo - 1;
 		int iz = ((ztmp >= zbboxhi)? zhi : zlo);
 		iz = ((ztmp < zbboxlo)? iz-1 : iz);
 
@@ -103,7 +87,8 @@ neighbor_kern1(
 		int k;
 		for(k = 0; k < nstencil; k++) {
 
-			int4 s = read_imagei(img_stencil, sampler0, (int2)(k,0));
+			int4 s = read_imagei(img_stencil, sampler0, 
+				__builtin_vector_int2(k,0) );
 
 			int j = binhead[ibin+s.x];
 
